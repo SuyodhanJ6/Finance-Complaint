@@ -15,3 +15,4 @@ DATA_INGESTION_MIN_START_DATE = "2023-01-01"
 DATA_INGESTION_DATA_SOURCE_URL = f"https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/" \
                       f"?date_received_max=<todate>&date_received_min=<fromdate>" \
                       f"&field=all&format=json"
+
