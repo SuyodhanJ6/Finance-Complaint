@@ -149,5 +149,5 @@ dmypy.json
 .pyre/
 
 
-notebook/complaints-2023-05-30_06_37.json
-notebook/complaints-2023-05-30_06_37.json
+# ./notebook/complaints-2023-05-30_06_37.json
+notebook/*.json
