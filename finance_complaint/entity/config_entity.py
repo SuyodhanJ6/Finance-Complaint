@@ -1,20 +1,6 @@
 from dataclasses import dataclass
 
-
-@dataclass
-class DataIngestionMetadataInfo:
-    """
-    Represents metadata information for data ingestion.
-
-    Attributes:
-        from_date (str): Start date of the data ingestion.
-        to_date (str): End date of the data ingestion.
-        data_file_path (str): File path of the data file.
-    """
-    from_date: str
-    to_date: str
-    data_file_path: str
-
+############### THIS ALL ABOUT DATA INGESTION ###############
 
 @dataclass
 class TrainingPipelineConfig:
@@ -27,7 +13,6 @@ class TrainingPipelineConfig:
     """
     pipeline_name: str
     artifact_dir: str
-
 
 @dataclass
 class DataIngestionConfig:
@@ -54,3 +39,48 @@ class DataIngestionConfig:
     failed_dir: str
     metadata_file_path: str
     datasource_url: str
+
+
+@dataclass
+class DataIngestionMetadataInfo:
+    """
+    Represents metadata information for data ingestion.
+
+    Attributes:
+        from_date (str): Start date of the data ingestion.
+        to_date (str): End date of the data ingestion.
+        data_file_path (str): File path of the data file.
+    """
+    from_date: str
+    to_date: str
+    data_file_path: str
+
+@dataclass
+class DownloadUrl:
+    """
+    Represents a download URL along with the corresponding file path and retry information.
+    
+    Attributes:
+        url (str): The download URL.
+        file_path (str): The file path to save the downloaded file.
+        n_retry (int): The number of retry attempts for downloading the file.
+    """
+    url: str
+    file_path: str
+    n_retry: int
+
+
+
+@dataclass
+class DataIngestionArtifact:
+    """
+    Represents the artifact information related to data ingestion process.
+    
+    Attributes:
+        DataValidationArtifact (str): The data validation artifact.
+        accepted_file_path (str): The file path for accepted data.
+        rejected_dir (str): The directory path for rejected data.
+    """
+    feature_store_file_path: str
+    metadata_file_path: str
+    download_dir: str

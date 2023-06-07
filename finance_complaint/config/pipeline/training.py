@@ -40,7 +40,7 @@ class FinanceConfig:
         """
         Method Name: get_pipeline_config
         Description: Get the pipeline configuration.
-        Output: The TrainingPipelineConfig object.
+        Returns: The TrainingPipelineConfig object.
         On Failure: Raises a FinanceException if there is an error.
         """
         try:
@@ -68,7 +68,7 @@ class FinanceConfig:
         Inputs:
             - from_date: Start date of data ingestion.
             - to_date: End date of data ingestion.
-        Output: The DataIngestionConfig object.
+        Returns: The DataIngestionConfig object.
         On Failure: Raises a FinanceException if there is an error.
         """
         try:
