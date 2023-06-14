@@ -22,6 +22,7 @@ saved_models/*
 .ssh
 .vscode-server
 finance_artifact/*
+notebook/*
 # Distribution / packaging
 .Python
 .idea/
@@ -150,6 +151,6 @@ dmypy.json
 
 
 
-notebook/complaints-2023-05-30_06_37.json
+# notebook/complaints-2023-05-30_06_37.json
 
 # /home/suyodhan/Finance-Complaint/notebook/complaints-2023-05-30_06_37.json
