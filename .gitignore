@@ -23,6 +23,8 @@ saved_models/*
 .vscode-server
 finance_artifact/*
 notebook/*
+finance_complaint/config/*
+
 # Distribution / packaging
 .Python
 .idea/
@@ -148,7 +150,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
 
 
 # notebook/complaints-2023-05-30_06_37.json
