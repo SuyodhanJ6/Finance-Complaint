@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-############### THIS ALL ABOUT DATA INGESTION ###############
+############### THIS ALL ABOUT DATA INGESTION CONFIG ###############
 
 @dataclass
 class TrainingPipelineConfig:
@@ -84,3 +84,65 @@ class DataIngestionArtifact:
     feature_store_file_path: str
     metadata_file_path: str
     download_dir: str
+
+
+
+############### THIS ALL ABOUT DATA VALIDATION CONFIG ###############
+
+
+
+@dataclass
+class DataValidationConfig:
+    """
+    Represents the configuration for data validation process.
+
+    Attributes:
+        accepted_data_dir (str): The directory path for accepted data.
+        rejected_data_dir (str): The directory path for rejected data.
+        file_name (str): The file name for the data.
+    """
+
+    accepted_data_dir: str
+    rejected_data_dir: str
+    file_name: str
+
+
+@dataclass
+class MissingReport:
+    """
+    Represents the missing report for a column.
+
+    Attributes:
+        total_row (int): The total number of rows in the DataFrame.
+        missing_row (int): The number of rows with missing values in the column.
+        missing_percentage (float): The percentage of missing values in the column.
+    """
+
+    total_row: int
+    missing_row: int
+    missing_percentage: float
+
+
+
+############### THIS ALL ABOUT DATA TRANSFORMATION CONFIG ###############
+
+
+@dataclass
+class DataTransformationConfig:
+    """
+    Represents the configuration for data transformation process.
+
+    Attributes:
+        file_name (str): The file name for the data.
+        export_pipeline_dir (str): The directory path for exporting the pipeline.
+        transformed_train_dir (str): The directory path for transformed train data.
+        transformed_test_dir (str): The directory path for transformed test data.
+        test_size (str): The size of the test data.
+    """
+
+    file_name: str
+    export_pipeline_dir: str
+    transformed_train_dir: str
+    transformed_test_dir: str
+    test_size: str
+

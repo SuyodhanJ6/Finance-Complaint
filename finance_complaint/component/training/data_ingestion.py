@@ -82,6 +82,14 @@ class DataIngestion:
 
 
     def download_files(self):
+        """
+        Method Name: download_files
+        Description: Downloads files based on the required intervals.
+        Revision:
+        Returns: None
+        On Failure: Raises FinanceException.
+
+        """
         try:
             get_intervals_list = self.get_required_interval()
             logger.info("Started downloading files")
@@ -95,13 +103,20 @@ class DataIngestion:
                 file_path = os.path.join(self.data_ingestion_config.download_dir, file_name)
                 download_url = DownloadUrl(url=url, file_path=file_path, n_retry=self.n_try)
                 self.download_data(download_url=download_url)
-                # return download_url.file_path
-                # return download_url
         except Exception as e:
             raise FinanceException(e, sys)
+
         
     def retry_download_data(self, data, download_url: DownloadUrl):
         """
+        Method Name: retry_download_data
+        Description: Retry the download process for a failed file.
+        Revision:
+        Args:
+            data: Failed response.
+            download_url (DownloadUrl): Download URL information.
+        Returns: None
+        On Failure: Raises FinanceException.
 
         """
         try:
@@ -131,99 +146,129 @@ class DataIngestion:
         except Exception as e:
             raise FinanceException(e, sys)
 
-    def download_data(self, download_url:DownloadUrl):
+
+    def download_data(self, download_url: DownloadUrl):
+        """
+        Method Name: download_data
+        Description: Downloads data from the specified URL and saves it as a JSON file.
+        Revision:
+        Args:
+            download_url (DownloadUrl): Download URL information.
+        Returns: None
+        On Failure: Raises FinanceException.
+
+        """
         try:
-            logger.info(f"Starting download operation : {download_url}")
+            logger.info(f"Starting download operation: {download_url}")
             download_dir = os.path.dirname(download_url.file_path)
             # Creating download directory
             os.makedirs(download_dir, exist_ok=True)
-            
+
             # Downloading data
             data = requests.get(download_url.url, params={'User-agent': f'your bot {uuid.uuid4()}'})
             try:
-                logger.info(f"Started writing downloaded data into json file: {download_url.file_path}")
+                logger.info(f"Started writing downloaded data into JSON file: {download_url.file_path}")
                 # Saving download data into hard disk
                 with open(download_url.file_path, 'w') as file_obj:
                     finance_complaint_data = list(map(lambda x: x["_source"],
-                                                      filter(lambda x: "_source" in x.keys(),
-                                                             json.loads(data.content)))
-                                                  )
+                                                    filter(lambda x: "_source" in x.keys(),
+                                                            json.loads(data.content)))
+                                                )
                     json.dump(finance_complaint_data, file_obj)
                     logger.info(f"Downloaded data has been written into file: {download_url.file_path}")
 
             except Exception as e:
-                logger.info("Failed to download hence retry again.")
-                # removing file failed file exist
+                logger.info("Failed to download, retrying...")
+                # Removing file if it exists
                 if os.path.exists(download_url.file_path):
                     os.remove(download_url.file_path)
                 self.retry_download_data(data, download_url=download_url)
         except Exception as e:
             raise FinanceException(e, sys)
-        
 
-        # def initalize_data_ingestion(self):
-            
-    def convert_files_to_parquet(self, ):
+        
+    def convert_files_to_parquet(self):
+        """
+        Method Name: convert_files_to_parquet
+        Description: Converts JSON files to Parquet format and saves them to the specified directory.
+        Revision:
+        Returns: str: Path of the created Parquet file.
+        On Failure: Raises FinanceException.
+
+        """
         try:
-            json_data_dir =  self.data_ingestion_config.download_dir
+            json_data_dir = self.data_ingestion_config.download_dir
             data_dir = self.data_ingestion_config.feature_store_dir
             output_file_name = self.data_ingestion_config.file_name
-            print(output_file_name)
             os.makedirs(data_dir, exist_ok=True)
 
             file_path = os.path.join(data_dir, f"{output_file_name}")
             logger.info(f"Parquet file will be created at: {file_path}")
             if not os.path.exists(json_data_dir):
                 return file_path
-            
+
             for file_name in os.listdir(json_data_dir):
                 json_file_path = os.path.join(json_data_dir, file_name)
-                logger.debug(f"Converting {json_file_path} into parquet format at {file_path}")
+                logger.debug(f"Converting {json_file_path} into Parquet format at {file_path}")
                 df = spark_session.read.json(json_file_path)
                 if df.count() > 0:
                     df.write.mode('append').parquet(file_path)
             return file_path
         except Exception as e:
             raise FinanceException(e, sys)
-        
+
 
     def write_metadata(self, file_path: str) -> None:
         """
-        This function help us to update metadata information 
-        so that we can avoid redundant download and merging.
+        Method Name: write_metadata
+        Description: Writes metadata information to a metadata file to avoid redundant download and merging.
+        Revision:
+        Parameters:
+            file_path (str): Path of the data file for which metadata is being written.
+        Returns: None
+        On Failure: Raises FinanceException.
 
         """
         try:
-            logger.info(f"Writing metadata info into metadata file.")
+            logger.info("Writing metadata info into metadata file.")
             metadata_info = DataIngestionMetadata(metadata_file_path=self.data_ingestion_config.metadata_file_path)
 
             metadata_info.write_meta_info(from_date=self.data_ingestion_config.from_date,
-                                              to_date=self.data_ingestion_config.to_date,
-                                              data_file_path=file_path
-                                              )
-            logger.info(f"Metadata has been written.")
+                                        to_date=self.data_ingestion_config.to_date,
+                                        data_file_path=file_path
+                                        )
+            logger.info("Metadata has been written.")
         except Exception as e:
             raise FinanceException(e, sys)
+
         
     def initialize_data_ingestion(self, ):
+        """
+        Method Name: initialize_data_ingestion
+        Description: Initializes the data ingestion process by downloading JSON files, converting them to Parquet format,
+                    and creating the data ingestion artifact.
+        Revision:
+        Returns:
+            DataIngestionArtifact: Data ingestion artifact containing relevant file paths and metadata information.
+        On Failure: Raises FinanceException.
+
+        """
         try:
-            logger.info("Downloading JSON Files : ")
+            logger.info("Downloading JSON Files")
             if self.data_ingestion_config.from_date != self.data_ingestion_config.to_date:
                 self.download_files()
 
-            
             if os.path.exists(self.data_ingestion_config.download_dir):
-                logger.info(f"Converting and combining downloaded json into parquet file")
+                logger.info("Converting and combining downloaded JSON into Parquet file")
                 file_path = self.convert_files_to_parquet()
                 self.write_metadata(file_path=file_path)
 
             feature_store_file_path = os.path.join(self.data_ingestion_config.feature_store_dir,
-                                                   self.data_ingestion_config.file_name)
+                                                self.data_ingestion_config.file_name)
             artifact = DataIngestionArtifact(
                 feature_store_file_path=feature_store_file_path,
                 download_dir=self.data_ingestion_config.download_dir,
                 metadata_file_path=self.data_ingestion_config.metadata_file_path,
-
             )
 
             logger.info(f"Data ingestion artifact: {artifact}")
@@ -231,10 +276,6 @@ class DataIngestion:
         except Exception as e:
             raise FinanceException(e, sys)
 
-
-        except Exception as e:
-            raise FinanceException(e, sys) 
-            
         
 if __name__ == '__main__':
     config = FinanceConfig()
